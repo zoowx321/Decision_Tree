@@ -110,9 +110,10 @@ public class decision_tree
 			
 			//SaveAttributeTmp.clear();
 		}
-		CountAtt = new int[NumAtt][MaxNumAttVal][SaveClass.size()];
-		CountClass = new int[SaveClass.size()];
+		CountAtt = new int[NumAtt][MaxNumAttVal][SaveClass.get(0).size()];
+		CountClass = new int[SaveClass.get(0).size()];
 		count_Att(NumAtt, MaxNumAttVal, save, SaveAttribute, SaveClass);
+		
 		//System.out.println(" 0:" + SaveAttribute.get(0));
 		//System.out.println(" have sunny?:" + SaveAttribute.get(0).contains("sunny"));
 		////////count = new double[NumAtt][MaxNumAttVal];
@@ -131,33 +132,47 @@ public class decision_tree
 		{
 			for(int j = 0; j<height;j++)
 			{
-				for(int n = 0; n<SaveAttribute.size();n++)
-				{
-					for(int k = 0; k<SaveAttribute.get(n).size();k++)
+				
+					for(int k = 0; k<SaveAttribute.get(i).size();k++)
 					{
-						if(save[j][i].equals(SaveAttribute.get(n).get(k)));
+						
+						if(save[j][i].equals(SaveAttribute.get(i).get(k)))
 						{
-							for(int ClassIndex = 0;ClassIndex<SaveClass.size();ClassIndex++)
-								if(save[j][width-1].equals(SaveClass.get(ClassIndex)))
+							//System.out.println(save[j][i].equals(SaveAttribute.get(i).get(k)));
+							System.out.println("save: "+save[j][i] + " saveAttribute.get("+i+").get("+k+ ") : "+SaveAttribute.get(i).get(k));
+							for(int ClassIndex = 0;ClassIndex<SaveClass.get(0).size();ClassIndex++)
+							{
+								//System.out.println("save: "+save[j][i] + " saveclass : "+SaveClass.get(0).get(ClassIndex));
+								if(save[j][width-1].equals(SaveClass.get(0).get(ClassIndex)))
 								{
-									CountAtt[n][k][ClassIndex]++;
-									System.out.println("test");
+									CountAtt[i][k][ClassIndex]++;
+									if(i == 0)
+										CountClass[ClassIndex]++;
+									System.out.println("CountAtt["+i+"]["+k+"]["+ClassIndex+"]"+"++");
 								}
+								
+							}
 						}
+						
+						
 					}
-				}
+				
 			}
 		}
 		
-		for(int i = 0; i<NumAtt;i++)
+		for(int i = 0; i<width-1;i++)
 		{
-			for(int j = 0; j<MaxNumAttVal;j++)
-			{
-				for(int n = 0; n<SaveClass.size();n++)
-					System.out.println(CountAtt[i][j][n]);
-			}
+			
+				for(int j = 0; j<SaveAttribute.get(i).size();j++)
+				{
+					for(int n = 0; n<SaveClass.get(0).size();n++)
+					{
+						System.out.println("saveAttribute" + SaveAttribute.get(i).get(j)+" "+SaveClass.get(0).get(n) +" CountAtt["+i+"]["+j+"]["+n+"] "+CountAtt[i][j][n]);
+					}
+				}
+			
 		}
-
+		System.out.println(CountClass[0] + " " + CountClass[1]);
 	}
 	static boolean ContainAlpha(String OneOfAtt)
 	{
