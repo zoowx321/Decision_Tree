@@ -7,7 +7,8 @@ public class decision_tree
 	
 	static int width = 5;
 	static int height = 14;
-	static double[][] count;
+	static int[][][] CountAtt;
+	static int[] CountClass;
 	static int Old;
 	public static void main(String[] args) throws Exception
 	{
@@ -21,7 +22,8 @@ public class decision_tree
 		
 		//ArrayList<String> Attribute = new ArrayList<String>();
 		//int NumOfAttribute = 5;
-		HashMap<Integer,ArrayList<String>> SaveAttribute = new HashMap<Integer,ArrayList<String>>();
+		ArrayList<ArrayList<String>> SaveAttribute = new ArrayList<ArrayList<String>>();
+		ArrayList<ArrayList<String>> SaveClass = new ArrayList<ArrayList<String>>();
 		ArrayList<String> SaveAttributeTmp = new ArrayList<String>();
 		String[][] save = new String[height][width];
 		//String[][] SaveAttribute = new String[NumOfAttribute][];
@@ -61,7 +63,7 @@ public class decision_tree
 		{
 			System.out.println();
 			int NumAttval = 0;
-			
+			SaveAttributeTmp = new ArrayList<String>();
 			for(j = 0;j<height;j++)
 			{
 				if(j>0)
@@ -84,15 +86,83 @@ public class decision_tree
 				//count_Att(save[j][i],SaveAttributeTmp);
 				
 			}
+			
+			ContainAlpha(SaveAttributeTmp.get(NumAttval-1));//show Attribute is categorical(true) or numerical(false)
+			
 			NumAtt++;
 			//System.out.println(" NumAttVal " + NumAttval);
 			MaxNumAttVal = comp_GetMax(NumAttval);
 			//System.out.println(" Temp MaxNumAttVal " + MaxNumAttVal);
-			SaveAttribute.put(i,SaveAttributeTmp);
+			/*for(j = 0;j<NumAttval;j++)
+			{
+				System.out.println(" test:" + SaveAttributeTmp.get(j));
+			}*/
+			if(i<width-1)
+				SaveAttribute.add(SaveAttributeTmp);
+			else
+			{
+				SaveClass.add(SaveAttributeTmp);
+				
+				//System.out.println(" test:" + SaveClass.get(0));
+			}
 			
-		}	
-		count = new double[NumAtt][MaxNumAttVal];
+			
+			
+			//SaveAttributeTmp.clear();
+		}
+		CountAtt = new int[NumAtt][MaxNumAttVal][SaveClass.size()];
+		CountClass = new int[SaveClass.size()];
+		count_Att(NumAtt, MaxNumAttVal, save, SaveAttribute, SaveClass);
+		//System.out.println(" 0:" + SaveAttribute.get(0));
+		//System.out.println(" have sunny?:" + SaveAttribute.get(0).contains("sunny"));
+		////////count = new double[NumAtt][MaxNumAttVal];
+		System.out.println();
+		//System.out.println(" test:" + SaveAttribute.get(3));
 		//System.out.println("NumAtt "+NumAtt + " MaxNumAttVal " + MaxNumAttVal);
+	}
+	static double CalculateEntropy()
+	{
+		count_Att();
+		return 0.0;
+	}
+	static void count_Att(int NumAtt, int MaxNumAttVal, String[][] save, ArrayList<ArrayList<String>> SaveAttribute, ArrayList<ArrayList<String>> SaveClass)
+	{
+		for(int i = 0; i<width-1;i++)
+		{
+			for(int j = 0; j<height;j++)
+			{
+				for(int n = 0; n<SaveAttribute.size();n++)
+				{
+					for(int k = 0; k<SaveAttribute.get(n).size();k++)
+					{
+						if(save[j][i].equals(SaveAttribute.get(n).get(k)));
+						{
+							for(int ClassIndex = 0;ClassIndex<SaveClass.size();ClassIndex++)
+								if(save[j][width-1].equals(SaveClass.get(ClassIndex)))
+								{
+									CountAtt[n][k][ClassIndex]++;
+									System.out.println("test");
+								}
+						}
+					}
+				}
+			}
+		}
+		
+		for(int i = 0; i<NumAtt;i++)
+		{
+			for(int j = 0; j<MaxNumAttVal;j++)
+			{
+				for(int n = 0; n<SaveClass.size();n++)
+					System.out.println(CountAtt[i][j][n]);
+			}
+		}
+
+	}
+	static boolean ContainAlpha(String OneOfAtt)
+	{
+		boolean atleastOneAlpha = OneOfAtt.matches(".*[a-zA-Z]+.*");
+		return atleastOneAlpha;
 	}
 	static int comp_GetMax(int New)
 	{
@@ -112,36 +182,6 @@ public class decision_tree
 		
 	}
 	//SaveAttribute.
-	/*static void count_Att(String save, ArrayList<String> SaveAttributeTmp)
-	{
-		if(save[i][0].equals("Sunny"))
-			count[0][0]++;
-		else if(save[i][0].equals("Overcast"))
-			count[0][1]++;
-		else if(save[i][0].equals("Rain"))
-			count[0][2]++;
-		
-		if(save[i][1].equals("Hot"))
-			count[1][0]++;
-				else if(save[i][1].equals("Mild"))
-					count[1][1]++;
-						else if(save[i][1].equals("Cool"))
-							count[1][2]++;
-								
-		
-		if(save[i][2].equals("High"))
-			count[2][0]++;
-				else if(save[i][2].equals("Normal"))
-					count[2][1]++;
-						
-		
-		if(save[i][3].equals("Weak"))
-			count[3][0]++;
-				else if(save[i][3].equals("Strong"))
-					count[3][1]++;
-						
-		c++;
-
-	}*/
+	
 
 }
