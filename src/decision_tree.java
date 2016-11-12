@@ -87,16 +87,21 @@ public class decision_tree
 				
 			}
 			
-			ContainAlpha(SaveAttributeTmp.get(NumAttval-1));//show Attribute is categorical(true) or numerical(false)
-			
+			if(ContainAlpha(SaveAttributeTmp.get(NumAttval-1)))//show Attribute is categorical(true) or numerical(false)
+			{}
+			else
+			{
+				Collections.sort(SaveAttributeTmp);
+				for(j = 0;j<NumAttval;j++)
+				{
+					System.out.println(" test:" + SaveAttributeTmp.get(j));
+				}
+			}
 			NumAtt++;
 			//System.out.println(" NumAttVal " + NumAttval);
 			MaxNumAttVal = comp_GetMax(NumAttval);
 			//System.out.println(" Temp MaxNumAttVal " + MaxNumAttVal);
-			/*for(j = 0;j<NumAttval;j++)
-			{
-				System.out.println(" test:" + SaveAttributeTmp.get(j));
-			}*/
+			
 			if(i<width-1)
 				SaveAttribute.add(SaveAttributeTmp);
 			else
