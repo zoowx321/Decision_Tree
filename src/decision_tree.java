@@ -14,8 +14,10 @@ public class decision_tree
 	static int Old;
 	static int Id = 0;
 	static double old;
+	static TreeNode root;
 	public static void main(String[] args) throws Exception
 	{
+		
 		GetData();
 	}
 	public static void GetData() throws Exception
@@ -330,5 +332,5 @@ public class decision_tree
 	}
 	//SaveAttribute.
 	
-
 }
+
