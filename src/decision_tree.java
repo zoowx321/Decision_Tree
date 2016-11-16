@@ -57,17 +57,19 @@ public class decision_tree
 		{
 			GetDataChild(node);
 			node.decompositionAttribute = calculation(info.NumAtt, info.MaxNumAttVal, info.save, info.SaveAttribute, info.SaveClass);
+			System.out.println("info entropy : " + info.entropy);
 			if(info.entropy>0.7)
 				return;
 			node.Istravel = true;
-			System.out.println("test");
+			//System.out.println("test");
 		}
 		node.children = new TreeNode[node.decompositionAttribute.size()];
 		
 		ArrayList<ArrayList<String>> tmp = new ArrayList<ArrayList<String>>();
 		ArrayList<String> tmpIn = new ArrayList<String>();
+
 		tmpIn.add("");
-		tmp = node.remainAttribute;
+		tmp.addAll(node.remainAttribute);
 		tmp.set(Id,tmpIn);
 		
 		System.out.println("children data:");
@@ -75,14 +77,22 @@ public class decision_tree
 		{
 			node.children[i] = new TreeNode();
 			node.children[i].parent = node;
-			node.children[i].data.addAll(MatchString(save, node.decompositionAttribute.get(i),Id));
-			node.children[i].decompositionValue = node.decompositionAttribute.get(i);
+			if(node.decompositionAttribute.size() > 1)//case1: categorical attribute
+			{
+				node.children[i].data.addAll(MatchString(save, node.decompositionAttribute.get(i),Id));
+				node.children[i].decompositionValue = node.decompositionAttribute.get(i);
+			}
+			else//case2: numerical attribute
+			{
+				node.children[i].data.addAll(UpDown(save, node.decompositionAttribute.get(0),Id,i));
+				node.children[i].decompositionValue = node.decompositionAttribute.get(0);
+			}
 			
 			node.children[i].remainAttribute = tmp;
 			node.children[i].remainClass = node.remainClass;
 			System.out.println(node.children[i].data);
 		}
-		System.out.println(node.remainAttribute);
+		System.out.println(root.remainAttribute);
 		System.out.println(node.children[0].remainAttribute);
 		System.out.println();
 		/*for(int i = 0; i<node.decompositionAttribute.size();i++)
@@ -116,6 +126,47 @@ public class decision_tree
 
 				//System.out.println("tmp : "+tmp);
 				output.add(tmp);
+			}
+			
+			
+		}
+		//System.out.println("output: "+ output);
+		return output;
+	}
+	
+	public static ArrayList<ArrayList<String>> UpDown(String[][] input, String matchingTarget,int Att,int num)
+	{
+		ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>();
+		ArrayList<String> tmp;
+		
+		for(int i = 0; i<input.length;i++)
+		{
+			tmp = new ArrayList<String>();
+			if(num == 0)
+			{
+				if(Integer.parseInt(input[i][Att])<(Integer.parseInt(matchingTarget)))
+				{
+					for(int j = 0; j<input[i].length;j++)
+					{
+						tmp.add(input[i][j]); 
+					}
+	
+					//System.out.println("tmp : "+tmp);
+					output.add(tmp);
+				}
+			}
+			else if(num == 1)
+			{
+				if(Integer.parseInt(input[i][Att])>=(Integer.parseInt(matchingTarget)))
+				{
+					for(int j = 0; j<input[i].length;j++)
+					{
+						tmp.add(input[i][j]); 
+					}
+	
+					//System.out.println("tmp : "+tmp);
+					output.add(tmp);
+				}
 			}
 			
 			
@@ -198,7 +249,7 @@ public class decision_tree
 	public static void GetData() throws Exception
 
 	{
-
+		
 		String GetLine;
 
 		int j = 0;
@@ -421,7 +472,8 @@ public class decision_tree
 	static ArrayList<String> calculation(int NumAtt, int MaxNumAttVal, String[][] save, ArrayList<ArrayList<String>> SaveAttribute, ArrayList<ArrayList<String>> SaveClass)
 
 	{
-
+		ArrayList<Integer> numericAttribute = new ArrayList<Integer>();
+		HashMap<Integer,Integer> NumericAttribute = new HashMap<>();
 		for(int i = 0; i<width-1;i++)
 
 		{
@@ -496,7 +548,7 @@ public class decision_tree
 
 		{
 			num4weight = 0;
-			if(ContainAlpha(SaveAttribute.get(i).get(0)))
+			if(ContainAlpha(SaveAttribute.get(i).get(0)))//categorical attribute
 
 			{
 
@@ -558,16 +610,15 @@ public class decision_tree
 
 			}
 
-			else
-
+			else if(ContainNumber(SaveAttribute.get(i).get(0)))//numerical attribute
 			{
 
 				old = 1;//cause it's min..... not 0
 
 				double Min = 0;
-
+				Integer AValue = null;
+				
 				for(int x = 0; x<SaveAttribute.get(i).size();x++)
-
 				{
 
 					for(int n = 0; n<SaveClass.get(0).size();n++)
@@ -681,10 +732,16 @@ public class decision_tree
 
 						Min = comp(H_T,x);
 
+						//System.out.println("asdf : " + SaveAttribute.get(i) + "Id : " + Id);
+						AValue = Id;
 						
-
 				}
-
+				if(SaveAttribute.get(i) != null)
+				{
+					numericAttribute.add(AValue);
+					NumericAttribute.put(i, AValue);
+				}
+				System.out.println("numericAttribute " + numericAttribute);
 				WeightedAverageH[i] = Min;
 
 				System.out.println("H " + WeightedAverageH[i] + " MIn " + Min);
@@ -694,7 +751,7 @@ public class decision_tree
 			
 
 		}
-
+		System.out.println(numericAttribute);
 		double MinWeightedAverageH = 0;
 
 		for(int i = 0; i<width-1;i++)
@@ -702,7 +759,6 @@ public class decision_tree
 		{
 
 			if(i == 0)
-
 				old = WeightedAverageH[i];
 
 			MinWeightedAverageH = comp(WeightedAverageH[i],i);
@@ -713,6 +769,16 @@ public class decision_tree
 
 		System.out.println("MinWeightedAverageH : "+SaveAttribute.get(Id) + " " + MinWeightedAverageH);
 		DataInfo.entropy = MinWeightedAverageH;
+		//if(ContainNumber(SaveAttribute.get(Id).get(NumericAttribute.get(Id))))
+		if(ContainNumber(SaveAttribute.get(Id).get(0)))
+		{
+			ArrayList<String> tmp = new ArrayList<String>();
+			
+			tmp.add(SaveAttribute.get(Id).get(NumericAttribute.get(Id)));
+			System.out.println("test1234 : " + tmp);
+			return tmp;
+		}
+		
 		return SaveAttribute.get(Id);
 	}
 
@@ -733,7 +799,16 @@ public class decision_tree
 		return atleastOneAlpha;
 
 	}
+	
+	static boolean ContainNumber(String OneOfAtt)
 
+	{
+
+		boolean atleastOneNumber = OneOfAtt.matches(".*[1-9]+.*");
+
+		return atleastOneNumber;
+
+	}
 	static int comp_GetMax(int New)
 
 	{
