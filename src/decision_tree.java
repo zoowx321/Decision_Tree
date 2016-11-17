@@ -51,6 +51,7 @@ public class decision_tree
 	static int count = 0;
 	public static void Decompose(TreeNode node) throws Exception
 	{
+		node.Istravel = false;
 		//System.out.println("fadsf"+root.remainAttribute);
 		System.out.println("count : "+ count);
 		if(count>0)
@@ -58,9 +59,15 @@ public class decision_tree
 			GetDataChild(node);
 			node.decompositionAttribute = calculation(info.NumAtt, info.MaxNumAttVal, info.save, info.SaveAttribute, info.SaveClass);
 			System.out.println("info entropy : " + info.entropy);
+			
 			if(info.entropy>0.7)
+			{
+				System.out.println("return by entropy > 0.7");
 				return;
-			node.Istravel = true;
+			}
+			
+			
+			
 			//System.out.println("test");
 		}
 		node.children = new TreeNode[node.decompositionAttribute.size()];
@@ -77,15 +84,18 @@ public class decision_tree
 		{
 			node.children[i] = new TreeNode();
 			node.children[i].parent = node;
-			if(node.decompositionAttribute.size() > 1)//case1: categorical attribute
+			if(ContainAlpha(node.decompositionAttribute.get(i)))//case1: categorical attribute
 			{
 				node.children[i].data.addAll(MatchString(save, node.decompositionAttribute.get(i),Id));
 				node.children[i].decompositionValue = node.decompositionAttribute.get(i);
 			}
 			else//case2: numerical attribute
 			{
+				//System.out.println(node.decompositionAttribute.size() + " " + i);
 				node.children[i].data.addAll(UpDown(save, node.decompositionAttribute.get(0),Id,i));
 				node.children[i].decompositionValue = node.decompositionAttribute.get(0);
+				
+				
 			}
 			
 			node.children[i].remainAttribute = tmp;
@@ -95,18 +105,31 @@ public class decision_tree
 		System.out.println(root.remainAttribute);
 		System.out.println(node.children[0].remainAttribute);
 		System.out.println();
-		/*for(int i = 0; i<node.decompositionAttribute.size();i++)
+		if(info.entropy == 0)
 		{
-			Decompose(node.children[i]);
+			System.out.println("return by entropy == 0");
+			return;
+			
+		}
+		if (node.Istravel)
+		{
+			System.out.println("return by node is traveled");
+			return;
+		}
+		node.Istravel = true;
+		for(int i = 0; i<node.decompositionAttribute.size();i++)
+		{
 			count++;
-		}*/
-		if(count < 2)
+			Decompose(node.children[i]);
+			
+		}
+		/*if(count < 2)
 		{
 			count++;
 			Decompose(node.children[0]);
 			
 			//System.out.println("test" + count);
-		}
+		}*/
 		
 	}
 	public static ArrayList<ArrayList<String>> MatchString(String[][] input, String matchingTarget,int Att)
@@ -773,8 +796,8 @@ public class decision_tree
 		if(ContainNumber(SaveAttribute.get(Id).get(0)))
 		{
 			ArrayList<String> tmp = new ArrayList<String>();
-			
-			tmp.add(SaveAttribute.get(Id).get(NumericAttribute.get(Id)));
+			for(int i = 0; i<2; i++)
+				tmp.add(SaveAttribute.get(Id).get(NumericAttribute.get(Id)));
 			System.out.println("test1234 : " + tmp);
 			return tmp;
 		}
