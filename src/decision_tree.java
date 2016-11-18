@@ -74,17 +74,19 @@ public class decision_tree
 		
 		ArrayList<ArrayList<String>> tmp = new ArrayList<ArrayList<String>>();
 		
-		ArrayList<String> tmpIn = new ArrayList<String>();
-		tmpIn.add("");
+		
 		tmp.addAll(node.remainAttribute);
 		if(ContainAlpha(node.decompositionAttribute.get(0)))
 		{
 			
-			
+			ArrayList<String> tmpIn = new ArrayList<String>();
+			tmpIn.add("");
 			tmp.set(Id,tmpIn);
 		}
 		else
 		{
+			System.out.println("test remain Attribute of root: " +root.remainAttribute);
+			//System.out.println("remain Attribute of children: " +node.children[0].remainAttribute);
 			int delete_Id = 0;
 			for(int i = 0; i<tmp.get(Id).size();i++)
 			{
@@ -96,7 +98,10 @@ public class decision_tree
 				}
 			}
 			//System.out.println("remain Attribute : " + tmp.get(Id).get(delete_Id) + "delete_Id : " + delete_Id);
-			tmp.get(Id).set(delete_Id, "");
+			String tmpIn = "";
+			tmp.get(Id).set(delete_Id, tmpIn);
+			System.out.println("remain Attribute of tmp: " +tmp);
+			System.out.println("test remain Attribute of root: " +root.remainAttribute);
 		}
 		
 		System.out.println("children data:");
@@ -131,8 +136,8 @@ public class decision_tree
 			node.children[i].remainClass = node.remainClass;
 			System.out.println(node.children[i].data);
 		}
-		System.out.println(root.remainAttribute);
-		System.out.println(node.children[0].remainAttribute);
+		System.out.println("remain Attribute of root: " +root.remainAttribute);
+		System.out.println("remain Attribute of children: " +node.children[0].remainAttribute);
 		System.out.println();
 		if(info.entropy == 0)
 		{
@@ -152,6 +157,7 @@ public class decision_tree
 			Decompose(node.children[i]);
 			
 		}
+		System.out.println("Decompose End");
 		/*if(count < 2)
 		{
 			count++;
@@ -160,6 +166,10 @@ public class decision_tree
 			//System.out.println("test" + count);
 		}*/
 		
+	}
+	public static String Preict(TreeNode input)
+	{
+		return "";
 	}
 	public static ArrayList<ArrayList<String>> MatchString(String[][] input, String matchingTarget,int Att)
 	{
@@ -442,13 +452,13 @@ public class decision_tree
 
 				Collections.sort(SaveAttributeTmp);
 
-				for(j = 0;j<NumAttval;j++)
+				/*for(j = 0;j<NumAttval;j++)
 
 				{
 
 					System.out.println(" test:" + SaveAttributeTmp.get(j));
 
-				}
+				}*/
 
 			}
 
@@ -845,7 +855,7 @@ public class decision_tree
 			for(int i = 0; i<2; i++)
 				tmp.add(SaveAttribute.get(Id).get(NumericAttribute.get(Id)));
 			//Id = NumericAttribute.get(Id);
-			System.out.println("reference value : " + tmp + " NumericAttribute.get(Id) : "+NumericAttribute.get(Id)+" Id : " + Id);
+			System.out.println("reference value : " + tmp);
 			return tmp;
 		}
 		
