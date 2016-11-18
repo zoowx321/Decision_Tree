@@ -73,11 +73,31 @@ public class decision_tree
 		node.children = new TreeNode[node.decompositionAttribute.size()];
 		
 		ArrayList<ArrayList<String>> tmp = new ArrayList<ArrayList<String>>();
+		
 		ArrayList<String> tmpIn = new ArrayList<String>();
-
 		tmpIn.add("");
 		tmp.addAll(node.remainAttribute);
-		tmp.set(Id,tmpIn);
+		if(ContainAlpha(node.decompositionAttribute.get(0)))
+		{
+			
+			
+			tmp.set(Id,tmpIn);
+		}
+		else
+		{
+			int delete_Id = 0;
+			for(int i = 0; i<tmp.get(Id).size();i++)
+			{
+				//System.out.println("equal? " + tmp.get(Id).get(i) + " " + node.decompositionAttribute.get(0));
+				if(tmp.get(Id).get(i).equals(node.decompositionAttribute.get(0)))
+				{
+					
+					delete_Id = i;
+				}
+			}
+			//System.out.println("remain Attribute : " + tmp.get(Id).get(delete_Id) + "delete_Id : " + delete_Id);
+			tmp.get(Id).set(delete_Id, "");
+		}
 		
 		System.out.println("children data:");
 		if(node.decompositionAttribute.get(0).equals("same value"))
@@ -85,7 +105,7 @@ public class decision_tree
 			node.children[0] = new TreeNode();
 			node.children[0].parent = node;
 			node.children[0].data.addAll(node.data);
-			System.out.println(node.children[0].data);
+			System.out.println(node.children[0].data + " ID : " + Id);
 			System.out.println("return by same value");
 			return;
 		}
@@ -824,7 +844,8 @@ public class decision_tree
 			ArrayList<String> tmp = new ArrayList<String>();
 			for(int i = 0; i<2; i++)
 				tmp.add(SaveAttribute.get(Id).get(NumericAttribute.get(Id)));
-			System.out.println("test1234 : " + tmp);
+			//Id = NumericAttribute.get(Id);
+			System.out.println("reference value : " + tmp + " NumericAttribute.get(Id) : "+NumericAttribute.get(Id)+" Id : " + Id);
 			return tmp;
 		}
 		
