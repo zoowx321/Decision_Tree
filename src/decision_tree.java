@@ -80,6 +80,15 @@ public class decision_tree
 		tmp.set(Id,tmpIn);
 		
 		System.out.println("children data:");
+		if(node.decompositionAttribute.get(0).equals("same value"))
+		{
+			node.children[0] = new TreeNode();
+			node.children[0].parent = node;
+			node.children[0].data.addAll(node.data);
+			System.out.println(node.children[0].data);
+			System.out.println("return by same value");
+			return;
+		}
 		for(int i = 0; i<node.decompositionAttribute.size();i++)
 		{
 			node.children[i] = new TreeNode();
@@ -497,6 +506,7 @@ public class decision_tree
 	{
 		ArrayList<Integer> numericAttribute = new ArrayList<Integer>();
 		HashMap<Integer,Integer> NumericAttribute = new HashMap<>();
+		int cc = 0;
 		for(int i = 0; i<width-1;i++)
 
 		{
@@ -516,10 +526,10 @@ public class decision_tree
 						if(save[j][i].equals(SaveAttribute.get(i).get(k)))
 
 						{
-
+							
 							//System.out.println(save[j][i].equals(SaveAttribute.get(i).get(k)));
 
-							System.out.println("save: "+save[j][i] + " saveAttribute.get("+i+").get("+k+ ") : "+SaveAttribute.get(i).get(k));
+							//System.out.println("save: "+save[j][i] + " saveAttribute.get("+i+").get("+k+ ") : "+SaveAttribute.get(i).get(k));
 
 							for(int ClassIndex = 0;ClassIndex<SaveClass.get(0).size();ClassIndex++)
 
@@ -533,11 +543,10 @@ public class decision_tree
 
 									CountAtt[i][k][ClassIndex]++;
 
-									if(i == 0)
-
+									//if(i == 0)
 										CountClass[ClassIndex]++;
 
-									System.out.println("CountAtt["+i+"]["+k+"]["+ClassIndex+"]"+"++");
+									//System.out.println("CountAtt["+i+"]["+k+"]["+ClassIndex+"]"+"++");
 
 								}
 
@@ -558,9 +567,26 @@ public class decision_tree
 			}
 
 		}
-
 		int num = 0;
-
+		double ClassEntropy = 0;
+		for(int ClassIndex = 0;ClassIndex<SaveClass.get(0).size();ClassIndex++)
+		{
+			num += CountClass[ClassIndex];
+			//System.out.println("<Calculation> CountClass "+ CountClass[ClassIndex]);
+		}
+		for(int ClassIndex = 0;ClassIndex<SaveClass.get(0).size();ClassIndex++)
+		{
+			ClassEntropy += (double)CountClass[ClassIndex]/num*CalLog2((double)CountClass[ClassIndex]/num);
+		}
+		//System.out.println("<Calculation> ClassEntropy "+ ClassEntropy);
+		if(Double.isNaN(ClassEntropy))
+		{
+			//System.out.println("<Calculation> same value ");
+			ArrayList<String> endtmp = new ArrayList<String>();
+			endtmp.add("same value");
+			return endtmp;
+		}
+		num = 0;
 		int num4weight = 0;
 
 		H = new double[NumAtt][MaxNumAttVal];
@@ -585,7 +611,7 @@ public class decision_tree
 
 					{
 
-						System.out.println("saveAttribute" + SaveAttribute.get(i).get(j)+" "+SaveClass.get(0).get(n) +" CountAtt["+i+"]["+j+"]["+n+"] "+CountAtt[i][j][n]);
+						//System.out.println("saveAttribute" + SaveAttribute.get(i).get(j)+" "+SaveClass.get(0).get(n) +" CountAtt["+i+"]["+j+"]["+n+"] "+CountAtt[i][j][n]);
 
 						num += CountAtt[i][j][n];
 
@@ -648,7 +674,7 @@ public class decision_tree
 
 					{
 
-						System.out.println("saveAttribute" + SaveAttribute.get(i).get(x)+" "+SaveClass.get(0).get(n) +" CountAtt["+i+"]["+x+"]["+n+"] "+CountAtt[i][x][n]);
+						//System.out.println("saveAttribute" + SaveAttribute.get(i).get(x)+" "+SaveClass.get(0).get(n) +" CountAtt["+i+"]["+x+"]["+n+"] "+CountAtt[i][x][n]);
 
 						
 
