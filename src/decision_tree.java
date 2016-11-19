@@ -13,13 +13,20 @@ public class decision_tree
 {
 
 	
-
+/////////training set configuration////////////
 	static int width = 5;
-
-	static int height = 14;
-	
+	static int height = 12;
 	static String[][] save = new String[height][width];
-
+///////////////////////////////////////////////
+	
+////////test set configuration/////////////////
+	static int Theight = 1;
+	static int Twidth = 4;
+	static String[][] testSet;
+///////////////////////////////////////////////
+	
+	static int maxClassIndex;
+	
 	static int[][][] CountAtt;
 
 	static int[] CountClass;
@@ -47,6 +54,42 @@ public class decision_tree
 		root.Istravel = true;
 		//System.out.println(root.decompositionAttribute.size());
 		Decompose(root);
+		String[][] testSet = {{"overcast", "" , "" ,""}};
+		//System.out.println(root.children[1].children[0].data);
+		System.out.println("answer : "+CheckTest(testSet,root));
+		
+	}
+	static int savetmp = 0;
+	public static String CheckTest(String[][] TestSet,TreeNode node)
+	{
+		
+		for(int x = 0; x<node.decompositionAttribute.size();x++)
+		{
+			for(int i = 0; i<TestSet.length;i++)
+			{
+				for(int j = 0; j<TestSet[i].length;j++)
+				{
+					
+					if(node.children[x].decompositionValue.equals(TestSet[i][j]))
+					{
+						//System.out.println("check" + node.children[x].Isendnode);
+						savetmp = x;
+						//System.out.println("print savetmp" + x);
+						//System.out.println(TestSet[i][j] + " " + node.children[x].decompositionValue);
+						if(node.children[x].Isendnode)
+						{
+							//System.out.println("answer of Testset is : " + node.children[x].answer);
+							return node.children[x].answer;
+						}
+						return CheckTest(TestSet, node.children[x]);
+					}
+					
+					
+				}
+			}
+		}
+		System.out.print("maybe predict ");
+		return root.children[savetmp].answer;
 	}
 	static int count = 0;
 	public static void Decompose(TreeNode node) throws Exception
@@ -110,14 +153,21 @@ public class decision_tree
 			node.children[0] = new TreeNode();
 			node.children[0].parent = node;
 			node.children[0].data.addAll(node.data);
+			node.Isendnode = true;
+			node.answer = node.children[0].data.get(0).get(node.children[0].data.get(0).size()-1);
+			System.out.println("answer : "+node.children[0].answer);
 			System.out.println(node.children[0].data + " ID : " + Id);
 			System.out.println("return by same value");
 			return;
 		}
+		//System.out.println("root.remainClass.get0 : "+root.remainClass.get(0));
 		for(int i = 0; i<node.decompositionAttribute.size();i++)
 		{
 			node.children[i] = new TreeNode();
 			node.children[i].parent = node;
+			node.children[i].Isendnode = false;
+			node.answer = root.remainClass.get(0).get(maxClassIndex);
+			//System.out.println("answer of "+i+" : "+ node.children[i].answer);
 			if(ContainAlpha(node.decompositionAttribute.get(i)))//case1: categorical attribute
 			{
 				node.children[i].data.addAll(MatchString(save, node.decompositionAttribute.get(i),Id));
@@ -126,7 +176,7 @@ public class decision_tree
 			else//case2: numerical attribute
 			{
 				//System.out.println(node.decompositionAttribute.size() + " " + i);
-				node.children[i].data.addAll(UpDown(save, node.decompositionAttribute.get(0),Id,i));
+				node.children[i].data.addAll(UpDown(save, node.decompositionAttribute.get(0),Id,i));//children0 = < , children1 = >=
 				node.children[i].decompositionValue = node.decompositionAttribute.get(0);
 				
 				
@@ -141,6 +191,15 @@ public class decision_tree
 		System.out.println();
 		if(info.entropy == 0)
 		{
+			for(int i = 0; i<node.children.length;i++)
+			{
+				node.children[i].Isendnode = true;
+				//System.out.println("EndNode");
+				node.children[i].answer = node.children[i].data.get(0).get(node.children[i].data.get(0).size()-1);
+				//System.out.println("answer : "+node.children[i].answer);
+			}
+			
+			
 			System.out.println("return by entropy == 0");
 			return;
 			
@@ -167,7 +226,7 @@ public class decision_tree
 		}*/
 		
 	}
-	public static String Preict(TreeNode input)
+	public static String Preict(TreeNode input, String testset)
 	{
 		return "";
 	}
@@ -334,7 +393,7 @@ public class decision_tree
 
 		//String[][] SaveAttribute = new String[NumOfAttribute][];
 
-		Scanner sc = new Scanner(new File("weather_numeric.txt"));
+		Scanner sc = new Scanner(new File("play-tennis_train.txt"));
 
 		while(sc.hasNext())
 
@@ -599,9 +658,19 @@ public class decision_tree
 		}
 		int num = 0;
 		double ClassEntropy = 0;
+		maxClassIndex = 0;
 		for(int ClassIndex = 0;ClassIndex<SaveClass.get(0).size();ClassIndex++)
 		{
 			num += CountClass[ClassIndex];
+			if(ClassIndex >0)
+			{
+				if(CountClass[ClassIndex] > CountClass[maxClassIndex])
+				{
+					maxClassIndex = ClassIndex;
+				}
+			}
+			
+			//comp_GetMax(CountClass[ClassIndex]);
 			//System.out.println("<Calculation> CountClass "+ CountClass[ClassIndex]);
 		}
 		for(int ClassIndex = 0;ClassIndex<SaveClass.get(0).size();ClassIndex++)

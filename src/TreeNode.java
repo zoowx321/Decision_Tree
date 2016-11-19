@@ -13,7 +13,8 @@ class TreeNode
 	public int Att;
 	public ArrayList<String> decompositionAttribute;
 	public String decompositionValue;
-	
+	public String answer;
+	public boolean Isendnode;
 	public TreeNode[] children;
 	public TreeNode parent;
 	
