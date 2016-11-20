@@ -36,7 +36,7 @@ public class decision_tree
 	static double[][] H;
 
 	static double[] WeightedAverageH;
-
+	static double averagePrecision = 0;
 	static int Old;
 
 	static int Id = 0;
@@ -51,8 +51,20 @@ public class decision_tree
 	{
 		int first = 0;
 		int last = Set;//boundary of test set
-		Composition(first, last);
 		
+		//Composition(8, 12);
+
+		for(int i = 0; i<k_fold;i++)
+		{
+			Composition(first, last);
+			first += Set;
+			last += Set; 
+			//System.out.println(first + " " + last);
+			save = new String[height][width];
+			count = 0;
+		}
+		System.out.println();
+		System.out.println("Average Precesion : " + averagePrecision/k_fold+"%");
 	}
 	public static void Composition(int first,int last) throws Exception
 	{
@@ -61,6 +73,7 @@ public class decision_tree
 		root.decompositionAttribute = calculation(info.NumAtt, info.MaxNumAttVal, info.save, info.SaveAttribute, info.SaveClass);
 		root.Istravel = true;
 		//System.out.println(root.decompositionAttribute.size());
+		
 		Decompose(root);
 		//String[][] testSet = {{"overcast", "" , "" ,""}};
 		//System.out.println(root.children[1].children[0].data);
@@ -68,15 +81,23 @@ public class decision_tree
 		double precision = 0;
 		for(int i = 0; i<testSet.length;i++)
 		{
+			System.out.println();
+			System.out.println("for testSet"+i);
+			System.out.println("Matching List:");
 			String answer = CheckTest(testSet[i],root);
-			System.out.println("answer : "+answer);
+			//System.out.println("answer : "+answer + " " + testSet[i][testSet[i].length-1]);
 			if(answer.equals(testSet[i][testSet[i].length-1]))
 			{
+				System.out.println("correct");
 				countCorrect++;
 			}
+			else
+				System.out.println("wrong");
 		}
-		precision = countCorrect/Set*100;
+		//System.out.println("countcorrect"+ countCorrect);
+		precision = (double)countCorrect/Set*100;
 		System.out.println("precision(%) : "+precision+"%");
+		averagePrecision += precision;
 	}
 	static int savetmp = 0;
 	public static String CheckTest(String[] TestSet,TreeNode node)
@@ -119,6 +140,7 @@ public class decision_tree
 		{
 			GetDataChild(node);
 			node.decompositionAttribute = calculation(info.NumAtt, info.MaxNumAttVal, info.save, info.SaveAttribute, info.SaveClass);
+			//System.out.println("test0158 node.decompostionAtt : " + node.decompositionAttribute);
 			System.out.println("info entropy : " + info.entropy);
 			
 			if(info.entropy>0.7)
@@ -146,8 +168,8 @@ public class decision_tree
 		}
 		else
 		{
-			System.out.println("test remain Attribute of root: " +root.remainAttribute);
-			//System.out.println("remain Attribute of children: " +node.children[0].remainAttribute);
+			//System.out.println("test remain Attribute of root: " +root.remainAttribute);
+			
 			int delete_Id = 0;
 			for(int i = 0; i<tmp.get(Id).size();i++)
 			{
@@ -158,11 +180,11 @@ public class decision_tree
 					delete_Id = i;
 				}
 			}
-			//System.out.println("remain Attribute : " + tmp.get(Id).get(delete_Id) + "delete_Id : " + delete_Id);
+			
 			String tmpIn = "";
 			tmp.get(Id).set(delete_Id, tmpIn);
-			System.out.println("remain Attribute of tmp: " +tmp);
-			System.out.println("test remain Attribute of root: " +root.remainAttribute);
+			//System.out.println("test remain Attribute of tmp: " +tmp);
+			//System.out.println("test remain Attribute of root: " +root.remainAttribute);
 		}
 		
 		System.out.println("children data:");
@@ -172,6 +194,7 @@ public class decision_tree
 			node.children[0].parent = node;
 			node.children[0].data.addAll(node.data);
 			node.Isendnode = true;
+			//System.out.println("children data size : "+ node.children[0].data);
 			node.answer = node.children[0].data.get(0).get(node.children[0].data.get(0).size()-1);
 			System.out.println("answer : "+node.children[0].answer);
 			System.out.println(node.children[0].data + " ID : " + Id);
@@ -193,7 +216,7 @@ public class decision_tree
 			}
 			else//case2: numerical attribute
 			{
-				//System.out.println(node.decompositionAttribute.size() + " " + i);
+				//System.out.println("test 0151: "+node.decompositionAttribute.get(i));
 				node.children[i].data.addAll(UpDown(save, node.decompositionAttribute.get(0),Id,i));//children0 = < , children1 = >=
 				node.children[i].decompositionValue = node.decompositionAttribute.get(0);
 				
@@ -202,8 +225,9 @@ public class decision_tree
 			
 			node.children[i].remainAttribute = tmp;
 			node.children[i].remainClass = node.remainClass;
-			System.out.println(node.children[i].data);
+			System.out.println("children["+i+"] "+node.children[i].data);
 		}
+		//System.out.println("test0201 : "+node.children[0].data);
 		System.out.println("remain Attribute of root: " +root.remainAttribute);
 		System.out.println("remain Attribute of children: " +node.children[0].remainAttribute);
 		System.out.println();
@@ -211,6 +235,10 @@ public class decision_tree
 		{
 			for(int i = 0; i<node.children.length;i++)
 			{
+				//System.out.println(node.children[i].data.isEmpty());
+				if(node.children[i].data.isEmpty())
+					continue;
+				//System.out.println("i" + i);
 				node.children[i].Isendnode = true;
 				//System.out.println("EndNode");
 				node.children[i].answer = node.children[i].data.get(0).get(node.children[i].data.get(0).size()-1);
@@ -315,6 +343,7 @@ public class decision_tree
 	}
 	public static void GetDataChild(TreeNode node) throws Exception
 	{
+		
 		ArrayList<ArrayList<String>> input = new ArrayList<ArrayList<String>>();
 		input = node.data;
 		save = new String[input.size()][width];
@@ -412,7 +441,8 @@ public class decision_tree
 		//String[][] SaveAttribute = new String[NumOfAttribute][];
 
 		Scanner sc = new Scanner(new File("play-tennis_train.txt"));
-
+		//System.out.println("size of save "+save.length);
+		int count = 0;
 		while(sc.hasNext())
 
 		{
@@ -428,18 +458,20 @@ public class decision_tree
 			else if (GetLine.startsWith(""))
 
 				continue;*/
-			if(j>=first && j<last)//for k-fold validation. Make test set
+			if(count>=first && count<last)//for k-fold validation. Make test set
 			{
+				//System.out.println("j" + j);
 				testSet[j] = GetLine.split(",");
 				j++;
 			}
 			else//for k-fold validation. Make training set
 			{
+				//System.out.println("i" + i);
 				save[i] = GetLine.split(",");
 				i++;
 			}
 			
-
+			count++;
 			//System.out.print("");
 
 		}
@@ -634,7 +666,7 @@ public class decision_tree
 	{
 		ArrayList<Integer> numericAttribute = new ArrayList<Integer>();
 		HashMap<Integer,Integer> NumericAttribute = new HashMap<>();
-		int cc = 0;
+
 		for(int i = 0; i<width-1;i++)
 
 		{
@@ -672,9 +704,9 @@ public class decision_tree
 									CountAtt[i][k][ClassIndex]++;
 
 									//if(i == 0)
-										CountClass[ClassIndex]++;
+									CountClass[ClassIndex]++;
 
-									//System.out.println("CountAtt["+i+"]["+k+"]["+ClassIndex+"]"+"++");
+									//System.out.println("CountAtt["+i+"]["+k+"]["+ClassIndex+"]"+"++" + " " + save[j][i]);
 
 								}
 
@@ -695,6 +727,7 @@ public class decision_tree
 			}
 
 		}
+		
 		int num = 0;
 		double ClassEntropy = 0;
 		maxClassIndex = 0;
@@ -735,6 +768,7 @@ public class decision_tree
 
 		{
 			num4weight = 0;
+			//System.out.println("print saveAttribute.get"+i+".get0"+SaveAttribute.get(i).get(0));
 			if(ContainAlpha(SaveAttribute.get(i).get(0)))//categorical attribute
 
 			{
@@ -776,13 +810,17 @@ public class decision_tree
 							}
 
 							H[i][j] += -(double)CountAtt[i][j][n]/num*CalLog2((double)CountAtt[i][j][n]/num);
-							//System.out.println("Hij : " + H[i][j]);
+							//System.out.println("Hij : " + H[i][j] + " "+"CountAtt"+i+j+n+" " +CountAtt[i][j][n] + " num "+num);
 						}
 
 						//System.out.println("H "+H[i][j]);
-
-						WeightedAverageH[i] += (double)H[i][j]*num;
-						//System.out.println("num : " + num + " H : "+H[i][j]);
+						if(Double.isNaN((double)H[i][j]*num))
+						{
+							WeightedAverageH[i] += 0;
+						}
+						else
+							WeightedAverageH[i] += (double)H[i][j]*num;
+						//System.out.println("num : " + num + " H : "+H[i][j] + " TempWeightedAverageH"+i+" : "+WeightedAverageH[i]);
 						num4weight += num;
 						//System.out.println("num4weight "+num4weight);
 					
@@ -792,8 +830,12 @@ public class decision_tree
 				}
 
 				WeightedAverageH[i] = (double)WeightedAverageH[i]/num4weight;
+				if(Double.isNaN(WeightedAverageH[i]))
+				{
+					WeightedAverageH[i] = 0;
+				}
 				//System.out.println("num4weight "+num4weight);
-				System.out.println("H " + WeightedAverageH[i]);
+				//System.out.println("WeightedAverageH"+i+" " + WeightedAverageH[i]);
 
 			}
 
@@ -934,7 +976,10 @@ public class decision_tree
 				System.out.println("H " + WeightedAverageH[i] + " MIn " + Min);
 
 			}
-
+			else
+			{
+				WeightedAverageH[i] = 10;
+			}
 			
 
 		}
@@ -946,15 +991,18 @@ public class decision_tree
 		{
 
 			if(i == 0)
+			{
 				old = WeightedAverageH[i];
+				Id = 0;
+			}
 
 			MinWeightedAverageH = comp(WeightedAverageH[i],i);
 
 		}
 
 		//System.out.println(CountClass[0] + " " + CountClass[1]);
-
-		System.out.println("MinWeightedAverageH : "+SaveAttribute.get(Id) + " " + MinWeightedAverageH);
+		//System.out.println("SaveAttribute.get(0) : " +SaveAttribute.get(0) + " " + Id);
+		//System.out.println("MinWeightedAverageH : "+SaveAttribute.get(Id) + " " + MinWeightedAverageH);
 		DataInfo.entropy = MinWeightedAverageH;
 		//if(ContainNumber(SaveAttribute.get(Id).get(NumericAttribute.get(Id))))
 		if(ContainNumber(SaveAttribute.get(Id).get(0)))
@@ -1037,7 +1085,7 @@ public class decision_tree
 
 	{
 
-		//System.out.println("Old New" + Old + " " + New);
+		//System.out.println("Old New " + old + " " + New);
 
 		if (old>=New)
 
@@ -1046,7 +1094,7 @@ public class decision_tree
 			old = New;
 
 			Id = id;
-
+			//System.out.println("Id : "+Id);
 			return New;
 
 			
