@@ -64,8 +64,19 @@ public class decision_tree
 		Decompose(root);
 		//String[][] testSet = {{"overcast", "" , "" ,""}};
 		//System.out.println(root.children[1].children[0].data);
+		int countCorrect = 0;
+		double precision = 0;
 		for(int i = 0; i<testSet.length;i++)
-			System.out.println("answer : "+CheckTest(testSet[i],root));
+		{
+			String answer = CheckTest(testSet[i],root);
+			System.out.println("answer : "+answer);
+			if(answer.equals(testSet[i][testSet[i].length-1]))
+			{
+				countCorrect++;
+			}
+		}
+		precision = countCorrect/Set*100;
+		System.out.println("precision(%) : "+precision+"%");
 	}
 	static int savetmp = 0;
 	public static String CheckTest(String[] TestSet,TreeNode node)
