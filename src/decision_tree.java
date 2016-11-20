@@ -12,10 +12,10 @@ public class decision_tree
 
 {
 
-	static int k_fold = 3;
+	static int k_fold = 10;
 /////////training set configuration////////////
-	static int width = 5;
-	static int Height = 12;
+	static int width = 27;
+	static int Height = 100;
 	static int Set = Height/k_fold;
 	static int height = Height - Set;
 	static String[][] save = new String[height][width];
@@ -23,7 +23,7 @@ public class decision_tree
 	
 ////////test set configuration/////////////////
 	static int Theight = Set;
-	static int Twidth = 5;
+	static int Twidth = 27;
 	static String[][] testSet = new String[Theight][Twidth] ;
 ///////////////////////////////////////////////
 	
@@ -440,7 +440,7 @@ public class decision_tree
 
 		//String[][] SaveAttribute = new String[NumOfAttribute][];
 
-		Scanner sc = new Scanner(new File("play-tennis_train.txt"));
+		Scanner sc = new Scanner(new File("train_rev2.txt"));
 		//System.out.println("size of save "+save.length);
 		int count = 0;
 		while(sc.hasNext())
@@ -973,7 +973,7 @@ public class decision_tree
 				System.out.println("numericAttribute " + numericAttribute);
 				WeightedAverageH[i] = Min;
 
-				System.out.println("H " + WeightedAverageH[i] + " MIn " + Min);
+				//System.out.println("H " + WeightedAverageH[i] + " MIn " + Min);
 
 			}
 			else
@@ -1005,9 +1005,14 @@ public class decision_tree
 		//System.out.println("MinWeightedAverageH : "+SaveAttribute.get(Id) + " " + MinWeightedAverageH);
 		DataInfo.entropy = MinWeightedAverageH;
 		//if(ContainNumber(SaveAttribute.get(Id).get(NumericAttribute.get(Id))))
-		if(ContainNumber(SaveAttribute.get(Id).get(0)))
+		if(ContainAlpha(SaveAttribute.get(Id).get(0)))
+		{}
+		else if(ContainNumber(SaveAttribute.get(Id).get(0)))
 		{
 			ArrayList<String> tmp = new ArrayList<String>();
+			System.out.println(SaveAttribute.get(Id));
+			System.out.println(NumericAttribute);
+			System.out.println("reference value : " + SaveAttribute.get(Id).get(NumericAttribute.get(Id)));
 			for(int i = 0; i<2; i++)
 				tmp.add(SaveAttribute.get(Id).get(NumericAttribute.get(Id)));
 			//Id = NumericAttribute.get(Id);
