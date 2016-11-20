@@ -12,17 +12,19 @@ public class decision_tree
 
 {
 
-	
+	static int k_fold = 3;
 /////////training set configuration////////////
 	static int width = 5;
-	static int height = 12;
+	static int Height = 12;
+	static int Set = Height/k_fold;
+	static int height = Height - Set;
 	static String[][] save = new String[height][width];
 ///////////////////////////////////////////////
 	
 ////////test set configuration/////////////////
-	static int Theight = 1;
-	static int Twidth = 4;
-	static String[][] testSet;
+	static int Theight = Set;
+	static int Twidth = 5;
+	static String[][] testSet = new String[Theight][Twidth] ;
 ///////////////////////////////////////////////
 	
 	static int maxClassIndex;
@@ -47,35 +49,40 @@ public class decision_tree
 	public static void main(String[] args) throws Exception
 
 	{
-
-		GetData();
+		int first = 0;
+		int last = Set;//boundary of test set
+		Composition(first, last);
+		
+	}
+	public static void Composition(int first,int last) throws Exception
+	{
+		GetData(first,last);
 		//System.out.println(calculation(info.NumAtt, info.MaxNumAttVal, info.save, info.SaveAttribute, info.SaveClass));
 		root.decompositionAttribute = calculation(info.NumAtt, info.MaxNumAttVal, info.save, info.SaveAttribute, info.SaveClass);
 		root.Istravel = true;
 		//System.out.println(root.decompositionAttribute.size());
 		Decompose(root);
-		String[][] testSet = {{"overcast", "" , "" ,""}};
+		//String[][] testSet = {{"overcast", "" , "" ,""}};
 		//System.out.println(root.children[1].children[0].data);
-		System.out.println("answer : "+CheckTest(testSet,root));
-		
+		for(int i = 0; i<testSet.length;i++)
+			System.out.println("answer : "+CheckTest(testSet[i],root));
 	}
 	static int savetmp = 0;
-	public static String CheckTest(String[][] TestSet,TreeNode node)
+	public static String CheckTest(String[] TestSet,TreeNode node)
 	{
 		
 		for(int x = 0; x<node.decompositionAttribute.size();x++)
 		{
-			for(int i = 0; i<TestSet.length;i++)
-			{
-				for(int j = 0; j<TestSet[i].length;j++)
+			
+				for(int j = 0; j<TestSet.length;j++)
 				{
 					
-					if(node.children[x].decompositionValue.equals(TestSet[i][j]))
+					if(node.children[x].decompositionValue.equals(TestSet[j]))
 					{
 						//System.out.println("check" + node.children[x].Isendnode);
 						savetmp = x;
 						//System.out.println("print savetmp" + x);
-						//System.out.println(TestSet[i][j] + " " + node.children[x].decompositionValue);
+						System.out.println(TestSet[j] + " " + node.children[x].decompositionValue);
 						if(node.children[x].Isendnode)
 						{
 							//System.out.println("answer of Testset is : " + node.children[x].answer);
@@ -86,7 +93,7 @@ public class decision_tree
 					
 					
 				}
-			}
+			
 		}
 		System.out.print("maybe predict ");
 		return root.children[savetmp].answer;
@@ -367,7 +374,7 @@ public class decision_tree
 
 		//System.out.println("NumAtt "+NumAtt + " MaxNumAttVal " + MaxNumAttVal);
 	}
-	public static void GetData() throws Exception
+	public static void GetData(int first, int last) throws Exception
 
 	{
 		
@@ -410,10 +417,17 @@ public class decision_tree
 			else if (GetLine.startsWith(""))
 
 				continue;*/
-
-			save[i] = GetLine.split(",");
-
-			i++;
+			if(j>=first && j<last)//for k-fold validation. Make test set
+			{
+				testSet[j] = GetLine.split(",");
+				j++;
+			}
+			else//for k-fold validation. Make training set
+			{
+				save[i] = GetLine.split(",");
+				i++;
+			}
+			
 
 			//System.out.print("");
 
@@ -421,11 +435,11 @@ public class decision_tree
 
 		sc.close();
 
-		for(i = 0; i<height;i++)
+		for(i = 0; i<save.length;i++)
 
 		{
 
-			for(j = 0;j<width;j++)
+			for(j = 0;j<save[i].length;j++)
 
 			{
 
@@ -437,7 +451,21 @@ public class decision_tree
 
 		}
 
+		for(i = 0; i<Theight;i++)
 
+		{
+
+			for(j = 0;j<Twidth;j++)
+
+			{
+
+				System.out.print(testSet[i][j]);
+
+			}
+
+			System.out.println();
+
+		}
 
 		Old = 0;
 
